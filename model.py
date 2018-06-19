@@ -2,6 +2,7 @@ from keras.layers import RepeatVector, Concatenate
 from keras.layers import Dense, Activation, Dot
 from keras.layers import Input, Bidirectional, LSTM
 from keras.models import Model
+from keras.utils import plot_model
 from nmt_utils import *
 
 Tx = 30
@@ -46,6 +47,19 @@ def model(Tx, Ty, n_a, n_s, human_vocab_size, machine_vocab_size):
         out = output_layer(s)
         outputs.append(out)
 
-    model = Model(inputs=[X, s0, c0],outputs=outputs)
+    model = Model(inputs=[X, s0, c0], outputs=outputs)
 
     return model
+
+
+if __name__ == '__main__':
+    Tx = 30
+    Ty = 10
+    n_a = 32
+    n_s = 64
+    m = 10000
+    dataset, human_vocab, machine_vocab, inv_vocab = load_dataset(m)
+    X, Y, Xoh, Yoh = preprocess_data(dataset, human_vocab, machine_vocab, Tx, Ty)
+    model = model(Tx, Ty, n_a, n_s, len(human_vocab), len(machine_vocab))
+    model.summary()
+    plot_model(model, to_file='model.png')
